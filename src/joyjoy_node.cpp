@@ -10,18 +10,32 @@ double deadzone_ = 0.3;
 double scale = -1. / (1. - deadzone_) / 32767.;
 double unscaled_deadzone = 32767. * deadzone_;
 
-double scale_val(DWORD val)
+double scale_val_linear(DWORD val)
 {
     double ret = (val - 32767.) / 32767.;
 
     if (-0.1 < ret && ret < 0.1)
         return 0.;
     else if (ret < -1)
-        return 0.5;
+        return 0.15;
     else if (ret > 1)
-        return -0.5;
+        return -0.15;
 
-    return ret * -0.5;
+    return ret * -0.15;
+}
+
+double scale_val_angular(DWORD val)
+{
+    double ret = (val - 32767.) / 32767.;
+
+    if (-0.1 < ret && ret < 0.1)
+        return 0.;
+    else if (ret < -1)
+        return 0.4;
+    else if (ret > 1)
+        return -0.4;
+
+    return ret * -0.4;
 }
 
 int main(int argc, char **argv)
@@ -44,9 +58,9 @@ int main(int argc, char **argv)
 
         if (joystickInfo.dwButtons == 1)
         {
-            double valY = scale_val(joystickInfo.dwYpos);
+            double valY = scale_val_linear(joystickInfo.dwYpos);
             msg.linear.x = valY;
-            double valX = scale_val(joystickInfo.dwXpos);
+            double valX = scale_val_angular(joystickInfo.dwXpos);
             if (valY < 0)
                 msg.angular.z = -valX;
             else
